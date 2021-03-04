@@ -18,7 +18,7 @@ archivesBaseName = 'Bundles'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200514-1.16'
+    mappings channel: 'snapshot', version: '20200916-1.16.2'
     runs {
         client {
             workingDirectory project.file('run')
@@ -57,7 +57,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.3-34.1.23'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.0.42'
 }
 
 jar {

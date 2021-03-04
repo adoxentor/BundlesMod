@@ -22,26 +22,31 @@ public class BundleServerMessage {
      * If the Bundle should be cleared
      */
     public boolean empty;
+    /**
+     * If the Bundle should be cleared
+     */
+    public boolean reversed;
 
     /**
      * Default constructor
      */
     public BundleServerMessage() {
-        this(ItemStack.EMPTY,0, false);
+        this(ItemStack.EMPTY,0, false, false);
     }
 
 
     /**
      * Constructor
-     *
-     * @param bundle Bundle Item Stack
+     *  @param bundle Bundle Item Stack
      * @param slotId Item Stack Slot Id
      * @param empty If the Bundle should be cleared
+     * @param reversed
      */
-    public BundleServerMessage(ItemStack bundle, int slotId, boolean empty) {
+    public BundleServerMessage(ItemStack bundle, int slotId, boolean empty, boolean reversed) {
         this.bundle = bundle;
         this.slotId = slotId;
         this.empty = empty;
+        this.reversed = reversed;
     }
 
     /**
@@ -55,6 +60,7 @@ public class BundleServerMessage {
         message.bundle = buffer.readItemStack();
         message.slotId = buffer.readInt();
         message.empty = buffer.readBoolean();
+        message.reversed = buffer.readBoolean();
         return message;
     }
 
@@ -67,5 +73,6 @@ public class BundleServerMessage {
         buffer.writeItemStack(this.bundle);
         buffer.writeInt(this.slotId);
         buffer.writeBoolean(this.empty);
+        buffer.writeBoolean(this.reversed);
     }
 }

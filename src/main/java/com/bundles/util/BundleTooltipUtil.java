@@ -103,7 +103,7 @@ public class BundleTooltipUtil {
 
             for (ITextProperties textLine : textLines)
             {
-                int textLineWidth = font.func_238414_a_(textLine);
+                int textLineWidth = font.getStringPropertyWidth(textLine);
                 if (textLineWidth > tooltipTextWidth)
                     tooltipTextWidth = textLineWidth;
             }
@@ -138,13 +138,13 @@ public class BundleTooltipUtil {
                 for (int i = 0; i < textLines.size(); i++)
                 {
                     ITextProperties textLine = textLines.get(i);
-                    List<ITextProperties> wrappedLine = font.func_238420_b_().func_238362_b_(textLine, tooltipTextWidth, Style.field_240709_b_);
+                    List<ITextProperties> wrappedLine = font.getCharacterManager().func_238362_b_(textLine, tooltipTextWidth, Style.EMPTY);
                     if (i == 0)
                         titleLinesCount = wrappedLine.size();
 
                     for (ITextProperties line : wrappedLine)
                     {
-                        int lineWidth = font.func_238414_a_(line);
+                        int lineWidth = font.getStringPropertyWidth(line);
                         if (lineWidth > wrappedTooltipWidth)
                             wrappedTooltipWidth = lineWidth;
                         wrappedTextLines.add(line);
@@ -266,7 +266,7 @@ public class BundleTooltipUtil {
         RenderSystem.scalef(8.0F, 8.0F, 8.0F);
         MatrixStack matrixstack = new MatrixStack();
         IRenderTypeBuffer.Impl irendertypebuffer$impl = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        boolean flag = !bakedmodel.func_230044_c_();
+        boolean flag = !bakedmodel.isSideLit();
         if (flag) {
             RenderHelper.setupGuiFlatDiffuseLighting();
         }

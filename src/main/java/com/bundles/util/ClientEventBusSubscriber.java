@@ -33,7 +33,7 @@ public final class ClientEventBusSubscriber {
     @SubscribeEvent
     public static void clientSetup(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(BundleEvents.class);
-        event.enqueueWork(() -> ItemModelsProperties.func_239418_a_(
+        event.enqueueWork(() -> ItemModelsProperties.registerProperty(
                 BundleItems.BUNDLE.get()
                 , BundleResources.BUNDLE_FULL_NBT_RESOURCE_LOCATION
                 , new IItemPropertyGetter() {

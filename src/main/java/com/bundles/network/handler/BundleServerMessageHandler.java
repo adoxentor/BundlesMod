@@ -4,6 +4,7 @@ import com.bundles.init.BundleResources;
 import com.bundles.network.message.BundleClientMessage;
 import com.bundles.network.message.BundleServerMessage;
 import com.bundles.util.BundleItemUtils;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.PlayerContainer;
@@ -29,10 +30,11 @@ public class BundleServerMessageHandler {
     public static boolean isThisProtocolAcceptedByServer(String protocolVersion) {
         return BundleResources.MESSAGE_PROTOCOL_VERSION.equals(protocolVersion);
     }
+
     /**
      * Handle messages
      *
-     * @param message Message
+     * @param message     Message
      * @param ctxSupplier Context Supplier
      */
     public static void onMessageReceived(final BundleServerMessage message, Supplier<NetworkEvent.Context> ctxSupplier) {
@@ -40,12 +42,12 @@ public class BundleServerMessageHandler {
         LogicalSide side = context.getDirection().getReceptionSide();
         context.setPacketHandled(true);
 
-        if(!side.isServer()) {
+        if (!side.isServer()) {
             return;
         }
 
         final ServerPlayerEntity playerEntity = context.getSender();
-        if(playerEntity == null) {
+        if (playerEntity == null) {
             return;
         }
 
@@ -55,25 +57,35 @@ public class BundleServerMessageHandler {
     /**
      * Process the Message
      *
-     * @param message Message
+     * @param message      Message
      * @param playerEntity Player
      */
-    private static void processMessage(BundleServerMessage message, ServerPlayerEntity playerEntity) {
+    public static void processMessage(BundleServerMessage message, PlayerEntity playerEntity) {
         Container container = playerEntity.openContainer;
         Slot slot = container.getSlot(message.slotId);
         ItemStack slotStack = slot.getStack();
         boolean playEmptySound = false;
-        if(message.empty) {
+        if (message.empty) {
             playEmptySound = !BundleItemUtils.isEmpty(message.bundle);
             BundleItemUtils.emptyBundle(message.bundle, playerEntity);
             slotStack = message.bundle;
         } else {
-            BundleItemUtils.addItemStackToBundle(message.bundle, slotStack);
-            if(!playerEntity.isCreative() || !(container instanceof PlayerContainer)) {
+            if (slotStack.isEmpty()) {
+                slotStack = BundleItemUtils.removeFirstItemStack(message.bundle, message.reversed);
+            } else {
+                BundleItemUtils.addItemStackToBundle(playerEntity.inventory.getItemStack(), slotStack);
+            }
+            if (!playerEntity.isCreative() || !(container instanceof PlayerContainer)) {
                 playerEntity.inventory.setItemStack(message.bundle);
             }
         }
         slot.putStack(slotStack);
-        BundleResources.NETWORK.send(PacketDistributor.PLAYER.with(() -> playerEntity), new BundleClientMessage(message.bundle, message.slotId, slotStack, message.empty, playEmptySound));
+
+        if (playerEntity instanceof ServerPlayerEntity) {
+            BundleResources.NETWORK.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) playerEntity), new BundleClientMessage(message.bundle, message.slotId, slotStack, message.empty, playEmptySound));
+            ((ServerPlayerEntity) playerEntity).isChangingQuantityOnly = false;
+            ((ServerPlayerEntity) playerEntity).updateHeldItem();
+
+        }
     }
 }
